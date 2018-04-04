@@ -113,7 +113,7 @@ def analyze(fileObj, outputName):
 
     print("6.LDA模型拟合推断 -------- ")
     print("\nLDA Model:")
-    num_topics = 15
+    num_topics = 100
     lda = gensim.models.ldamodel.LdaModel(corpus_tfidf, num_topics=num_topics, id2word=dictionary, passes=60)
     print("LDA模型训练完成，训练时间为\t%.3f秒"%(time.time()-t_start))
 
@@ -146,16 +146,16 @@ def analyze(fileObj, outputName):
 
     vis_data = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
     # vis_data = pyLDAvis.gensim.prepare(corpus_lda, corpus_tfidf, dictionary)
-    pyLDAvis.show(vis_data)
+    # pyLDAvis.show(vis_data)
     # pyLDAvis.display(vis_data)
-    # pyLDAvis.save_html(vis_data, outputName+'.html')
+    pyLDAvis.save_html(vis_data, outputName+'.html')
 
 
 if __name__ == '__main__':
     # 开始的时间
     print("1.开始读入语料数据 -------- ")
     testDocument = open("../corpus/4095_01.txt")
-    analyze(testDocument, "testDocument")
+    analyze(testDocument, "testDocument_100")
 
 # manojsinha = open('manojsinha.txt')
 # analyze(manojsinha, 'manojsinha')
