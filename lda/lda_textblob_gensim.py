@@ -1,8 +1,6 @@
-import re, nltk
-from nltk.stem.porter import PorterStemmer
-from nltk.stem.snowball import SnowballStemmer
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
+#!/usr/bin/env Python
+# coding=utf-8
+
 from gensim import corpora, models, similarities
 import gensim
 import pyLDAvis.gensim
@@ -11,77 +9,26 @@ from gensim.parsing.preprocessing import STOPWORDS
 from pprint import pprint
 import time
 from textblob import TextBlob
-stemmer = SnowballStemmer("english")
-lemmatizer = WordNetLemmatizer()
 
 
-# stemmer = PorterStemmer()
-
-
-# 一.tokenize()函数--文本处理
-def tokenize(text):
-    text = text.lower()
-    text = re.sub("[^a-zA-Z]", " ", text)  # Removing numbers and punctuation
-    text = re.sub(" +", " ", text)  # Removing extra white space
-    # text = re.sub("\\b[a-zA-Z0-9]{10,100}\\b", " ", text)  # Removing very long words above 10 characters
-    text = re.sub("\\b[a-zA-Z0-9]{0,2}\\b", " ", text)  # Removing single characters (e.g k, K)
-    text = re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t]) |(\w+:\/\/\S+)", " ", text)
-    tokens = nltk.word_tokenize(text.strip())  # 分词
-
-    tokens = stem_tokens(tokens, stemmer)  # 词干化
-
-    tokens = nltk.pos_tag(tokens)  # 词性标注
-    # print("tokens:", tokens)
-    # Uncomment next line to use stemmer
-
-    # print(type(tokens))
-    return tokens
-
-
-# 二.词干化处理和词干还原
-def stem_tokens(tokens, stemmer):
-    stemmed = []
-    for item in tokens:
-        temp = stemmer.stem(item)
-        temp = lemmatizer.lemmatize(temp)
-        # stemmed.append(stemmer.stem(item))
-        stemmed.append(temp)
-    return stemmed
-
-
-# 三.停用词--nltk+gensim--去重
-def get_stop_word_set():
-    stopwordset = stopwords.words('english')
-    # freq_words = ['http', 'https', 'amp', 'com', 'co', 'th', 'ji', 'all', 'sampla', 'pQ', 'lot', 'sir', 'pxr', 'ncbn', 'plz', 'qnI', 'way', 'sEkq', 'iAvvaPhp', 'zYGLz', 'tHMJdha']
-    for i in STOPWORDS:
-        stopwordset.append(i)
-    stopwordset = list(set(stopwordset))
-    print("stopword:", stopwordset)
-    return stopwordset
-
-
-# 四.LDA分析
+# LDA分析
 def analyze(fileObj, outputName):
     t_start = time.time()
-
-    print("2.初始化停用词表 -------- ")
-    stopwordset =STOPWORDS
 
     text_corpus = []
     for doc in fileObj:
         doc = TextBlob(doc)
         processed_words = []
         for words, tag in doc.lower().tags:
-        # print("word:",words,tag)
+            # print("word:",words,tag)
             if words not in STOPWORDS and len(words) > 3:
                 if tag != 'IN' or tag != 'CC' or tag != 'DT' or tag != 'TO':
                     words = words.singularize()
                     processed_words.append(words)
-            # print("processed_words:", processed_words)
+                    # print("processed_words:", processed_words)
         text_corpus.append(processed_words)
         # print("processed_doc:", len(processed_doc))
 
-        # text_corpus.append(current_doc)
     print("读入语料数据并处理完成，用时%.3f秒" % (time.time() - t_start))
     length = len(text_corpus)
     print("文本树木：%d个" % length)
@@ -105,12 +52,12 @@ def analyze(fileObj, outputName):
 
     # 统计tfidf
     print("5.正在计算文档TF-IDF -------- ")
-    t_start=time.time()
+    t_start = time.time()
     tfidf = models.TfidfModel(corpus)
 
     # 得到每个文本的tfidf向量，稀疏矩阵
     corpus_tfidf = tfidf[corpus]
-    print("建立文档TF-IDF完成，用时%.3f秒"%(time.time()-t_start))
+    print("建立文档TF-IDF完成，用时%.3f秒" % (time.time() - t_start))
     print("TF-IDF:")
     for temp in corpus_tfidf:
         print(temp)
@@ -119,7 +66,7 @@ def analyze(fileObj, outputName):
     print("\nLDA Model:")
     num_topics = 100
     lda = gensim.models.ldamodel.LdaModel(corpus_tfidf, num_topics=num_topics, id2word=dictionary, passes=60)
-    print("LDA模型训练完成，训练时间为\t%.3f秒"%(time.time()-t_start))
+    print("LDA模型训练完成，训练时间为\t%.3f秒" % (time.time() - t_start))
 
     # 使用并行LDA加快处理速度
     # lda=gensim.models.ldamulticore.LdaMulticore(corpus=None, num_topics=100, id2word=None, workers=None, chunksize=2000,
@@ -150,9 +97,10 @@ def analyze(fileObj, outputName):
 
     vis_data = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
     # vis_data = pyLDAvis.gensim.prepare(corpus_lda, corpus_tfidf, dictionary)
+
     # pyLDAvis.show(vis_data)
     # pyLDAvis.display(vis_data)
-    pyLDAvis.save_html(vis_data, outputName+'.html')
+    pyLDAvis.save_html(vis_data, outputName + '.html')
 
 
 if __name__ == '__main__':
@@ -160,6 +108,3 @@ if __name__ == '__main__':
     print("1.开始读入语料数据 -------- ")
     testDocument = open("../corpus/4095_01.txt")
     analyze(testDocument, "testDocument_100")
-
-# manojsinha = open('manojsinha.txt')
-# analyze(manojsinha, 'manojsinha')

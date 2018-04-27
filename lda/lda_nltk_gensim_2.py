@@ -8,7 +8,7 @@ from pprint import pprint
 import re, nltk
 
 # 1.读取文件
-f = open('../corpus/4095_01.csv', encoding='gbk')
+f = open('../corpus/4095_01.csv', encoding='utf-8')
 stop_list = list(STOPWORDS)
 
 
