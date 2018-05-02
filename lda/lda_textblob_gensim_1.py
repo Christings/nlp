@@ -1,4 +1,4 @@
-#!/usr/bin/env Python
+# !/usr/bin/env Python
 # coding=utf-8
 
 from gensim import corpora, models, similarities
