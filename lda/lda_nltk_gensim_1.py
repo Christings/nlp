@@ -35,9 +35,8 @@ def tokenize(text):
 
     tokens = nltk.pos_tag(tokens)  # 词性标注
     # print("tokens:", tokens)
-    # Uncomment next line to use stemmer
-
     # print(type(tokens))
+
     return tokens
 
 
@@ -59,7 +58,7 @@ def get_stop_word_set():
     for i in STOPWORDS:
         stopwordset.append(i)
     stopwordset = list(set(stopwordset))
-    print("stopword:", stopwordset)
+    # print("stopword:", stopwordset)
     return stopwordset
 
 
@@ -81,6 +80,7 @@ def analyze(fileObj, outputName):
                     current_doc.append(temp_doc[word][0])
 
         text_corpus.append(current_doc)
+    print(type(text_corpus))
     print("读入语料数据并处理完成，用时%.3f秒" % (time.time() - t_start))
     length = len(text_corpus)
     print("文本树木：%d个" % length)
